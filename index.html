@@ -912,18 +912,23 @@ html&gt;body{padding:0}&lt;/style&gt;
     #generative-rotation-test .gr-title { margin:0; }
     #generative-rotation-test .gr-controls { margin-bottom:14px; }
     #generative-rotation-test .gr-status { display:grid; grid-template-columns:1fr auto auto; align-items:center; gap:12px; margin-bottom:14px; }
-    #generative-rotation-test .gr-stage { min-height:520px; display:flex; flex-direction:column; justify-content:center; gap:12px; background:#050505; color:#f4f4f4; border-color:#252525; box-shadow:0 18px 48px rgba(0,0,0,.28); }
+    #generative-rotation-test .gr-stage { min-height:650px; display:flex; flex-direction:column; justify-content:center; gap:12px; background:#050505; color:#f4f4f4; border-color:#252525; box-shadow:0 18px 48px rgba(0,0,0,.28); }
     #generative-rotation-test .gr-prompt { text-align:center; font-weight:500; }
     #generative-rotation-test .gr-meta { text-align:center; color:#a8a8a8; }
     #generative-rotation-test .gr-reference { display:flex; justify-content:center; }
-    #generative-rotation-test .gr-reference .gr-solid { max-width:300px; }
-    #generative-rotation-test .gr-options { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px; }
+    #generative-rotation-test .gr-reference-stack { width:100%; max-width:580px; }
+    #generative-rotation-test .gr-angle-labels { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; color:#a8a8a8; text-align:center; }
+    #generative-rotation-test .gr-view-pair { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; align-items:center; width:100%; }
+    #generative-rotation-test .gr-reference .gr-solid { max-width:280px; }
+    #generative-rotation-test .gr-options { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
     #generative-rotation-test .gr-options button { background:#0b0b0b; color:#f4f4f4; border-color:#303030; box-shadow:inset 0 1px 0 rgba(255,255,255,.04); }
     #generative-rotation-test .gr-options button:hover:not(:disabled) { background:#121212; border-color:#555; }
     #generative-rotation-test .gr-options button[aria-pressed=&quot;true&quot;] { border-color:#f2f2f2; box-shadow:0 0 0 2px rgba(255,255,255,.18); }
     #generative-rotation-test .gr-option-inner { display:flex; flex-direction:column; align-items:center; width:100%; }
     #generative-rotation-test .gr-letter { align-self:flex-start; font-weight:500; }
     #generative-rotation-test .gr-solid { display:block; width:100%; max-width:220px; height:auto; aspect-ratio:13/11; filter:drop-shadow(0 12px 9px rgba(0,0,0,.72)); }
+    #generative-rotation-test .gr-options .gr-view-pair { gap:4px; }
+    #generative-rotation-test .gr-options .gr-solid { max-width:165px; pointer-events:none; }
     #generative-rotation-test .gr-face-bright,
     #generative-rotation-test .gr-face-mid,
     #generative-rotation-test .gr-face-dark { stroke:#202020; stroke-width:1.45; stroke-linejoin:round; vector-effect:non-scaling-stroke; }
@@ -935,9 +940,10 @@ html&gt;body{padding:0}&lt;/style&gt;
     @media (max-width:560px) {
       #generative-rotation-test .gr-status { grid-template-columns:1fr auto; }
       #generative-rotation-test .gr-status .progress { grid-column:1/-1; grid-row:2; }
-      #generative-rotation-test .gr-stage { min-height:500px; }
-      #generative-rotation-test .gr-options { grid-template-columns:repeat(2,minmax(0,1fr)); }
-      #generative-rotation-test .gr-reference .gr-solid { max-width:250px; }
+      #generative-rotation-test .gr-stage { min-height:760px; }
+      #generative-rotation-test .gr-options { grid-template-columns:1fr; }
+      #generative-rotation-test .gr-reference .gr-solid { max-width:210px; }
+      #generative-rotation-test .gr-options .gr-solid { max-width:145px; }
     }
   &lt;/style&gt;
 
@@ -999,6 +1005,7 @@ html&gt;body{padding:0}&lt;/style&gt;
     const rotZ=a=&gt;[[Math.cos(a),-Math.sin(a),0],[Math.sin(a),Math.cos(a),0],[0,0,1]];
     const euler=(x,y,z)=&gt;mul(rotZ(z),mul(rotY(y),rotX(x)));
     const identity=[[1,0,0],[0,1,0],[0,0,1]];
+    const SECOND_VIEW=euler(rad(-25),rad(50),rad(12));
 
     function permutationParity(p){let n=0;for(let i=0;i&lt;3;i++)for(let j=i+1;j&lt;3;j++)if(p[i]&gt;p[j])n++;return n%2?-1:1;}
     const gridRotations=[];
@@ -1070,7 +1077,10 @@ html&gt;body{padding:0}&lt;/style&gt;
       return w&gt;.8&amp;&amp;h&gt;.8&amp;&amp;ratio&gt;.32&amp;&amp;ratio&lt;3.1;
     }
     function readableOrientation(points,level){
-      for(let i=0;i&lt;140;i++){const m=randomOrientation(level);if(isReadable(points,m))return m;}
+      for(let i=0;i&lt;180;i++){
+        const m=randomOrientation(level);
+        if(isReadable(points,m)&amp;&amp;isReadable(points,mul(SECOND_VIEW,m)))return m;
+      }
       return identity;
     }
 
@@ -1128,6 +1138,9 @@ html&gt;body{padding:0}&lt;/style&gt;
       &lt;/defs&gt;`;
       return `&lt;svg class=&quot;gr-solid&quot; viewBox=&quot;0 0 260 220&quot; role=&quot;img&quot; aria-label=&quot;${label}&quot; shape-rendering=&quot;geometricPrecision&quot;&gt;&lt;title&gt;${label}&lt;/title&gt;${gradients}${polygons}&lt;/svg&gt;`;
     }
+    function dualSolid(points,matrix,label){
+      return `&lt;span class=&quot;gr-view-pair&quot;&gt;${solidSvg(points,matrix,`${label}, angle 1`)}${solidSvg(points,mul(SECOND_VIEW,matrix),`${label}, angle 2`)}&lt;/span&gt;`;
+    }
 
     let state={index:0,score:0,streak:0,answered:false,complete:false,correctIndex:0};
     const level=()=&gt;Number(levelEl.value), cubeCount=()=&gt;({1:6,2:8,3:10})[level()];
@@ -1142,13 +1155,13 @@ html&gt;body{padding:0}&lt;/style&gt;
       const n=cubeCount(), base=generateSolid(n), forbidden=new Set([canonical(base)]), decoys=[];
       while(decoys.length&lt;3){const d=alterSolid(base,forbidden);if(d)decoys.push(d);else{forbidden.clear();forbidden.add(canonical(base));}}
       const [refOrientation,matchOrientation]=orientationPair(base,level());
-      referenceEl.innerHTML=solidSvg(base,refOrientation,&#x27;Reference solid&#x27;);
+      referenceEl.innerHTML=`&lt;div class=&quot;gr-reference-stack&quot;&gt;&lt;div class=&quot;gr-angle-labels text-small&quot;&gt;&lt;span&gt;Angle 1&lt;/span&gt;&lt;span&gt;Angle 2&lt;/span&gt;&lt;/div&gt;${dualSolid(base,refOrientation,&#x27;Reference solid&#x27;)}&lt;/div&gt;`;
       const options=shuffle([{points:base,correct:true,matrix:matchOrientation},...decoys.map(points=&gt;({points,correct:false,matrix:readableOrientation(points,level())}))]);
       state.correctIndex=options.findIndex(o=&gt;o.correct);
-      metaEl.textContent=`New ${n}-cube solid · pitch + yaw + roll`;
+      metaEl.textContent=`Two synchronized views · new ${n}-cube solid · pitch + yaw + roll`;
       options.forEach((o,i)=&gt;{
         const b=document.createElement(&#x27;button&#x27;);b.type=&#x27;button&#x27;;b.className=&#x27;btn viz-tile&#x27;;b.setAttribute(&#x27;aria-label&#x27;,`Option ${letters[i]}`);
-        b.innerHTML=`&lt;span class=&quot;gr-option-inner&quot;&gt;&lt;span class=&quot;gr-letter&quot;&gt;${letters[i]}&lt;/span&gt;${solidSvg(o.points,o.matrix,`Option ${letters[i]}`)}&lt;/span&gt;`;
+        b.innerHTML=`&lt;span class=&quot;gr-option-inner&quot;&gt;&lt;span class=&quot;gr-letter&quot;&gt;${letters[i]}&lt;/span&gt;${dualSolid(o.points,o.matrix,`Option ${letters[i]}`)}&lt;/span&gt;`;
         b.addEventListener(&#x27;click&#x27;,()=&gt;answer(i,b));optionsEl.appendChild(b);
       });
       setStatus();
