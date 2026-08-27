@@ -1001,6 +1001,9 @@ html&gt;body{padding:0}&lt;/style&gt;
     #generative-rotation-test .gr-head { display:flex; align-items:end; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:14px; }
     #generative-rotation-test .gr-title { margin:0; }
     #generative-rotation-test .gr-controls { margin-bottom:14px; }
+    #generative-rotation-test .gr-answer-toggle { align-self:center; padding:7px 10px; border:1px solid var(--input); border-radius:12px; background:var(--secondary); cursor:pointer; }
+    #generative-rotation-test .gr-answer-toggle-text { display:flex; flex-direction:column; line-height:1.2; }
+    #generative-rotation-test .gr-answer-toggle-note { margin-top:2px; color:var(--muted-foreground); }
     #generative-rotation-test .gr-status { display:grid; grid-template-columns:1fr auto auto; align-items:center; gap:12px; margin-bottom:14px; }
     #generative-rotation-test .gr-stage { min-height:650px; display:flex; flex-direction:column; justify-content:center; gap:12px; background:#050505; color:#f4f4f4; border-color:#252525; box-shadow:0 18px 48px rgba(0,0,0,.28); }
     #generative-rotation-test .gr-prompt { text-align:center; font-weight:500; }
@@ -1019,6 +1022,9 @@ html&gt;body{padding:0}&lt;/style&gt;
     #generative-rotation-test .gr-solid { display:block; width:100%; max-width:220px; height:auto; aspect-ratio:13/11; filter:drop-shadow(0 12px 9px rgba(0,0,0,.72)); }
     #generative-rotation-test .gr-options .gr-view-pair { gap:4px; }
     #generative-rotation-test .gr-options .gr-solid { max-width:165px; pointer-events:none; }
+    #generative-rotation-test.gr-one-answer-angle .gr-options .gr-view-pair { grid-template-columns:minmax(0,1fr); justify-items:center; }
+    #generative-rotation-test.gr-one-answer-angle .gr-options .gr-view-pair &gt; .gr-solid:nth-child(2) { display:none; }
+    #generative-rotation-test.gr-one-answer-angle .gr-options .gr-solid { max-width:230px; }
     #generative-rotation-test .gr-face-bright,
     #generative-rotation-test .gr-face-mid,
     #generative-rotation-test .gr-face-dark { stroke:#202020; stroke-width:1.45; stroke-linejoin:round; vector-effect:non-scaling-stroke; }
@@ -1057,6 +1063,10 @@ html&gt;body{padding:0}&lt;/style&gt;
         &lt;option value=&quot;3&quot;&gt;Expert · 10 cubes&lt;/option&gt;
       &lt;/select&gt;
     &lt;/label&gt;
+    &lt;label class=&quot;form-check gr-answer-toggle&quot;&gt;
+      &lt;input class=&quot;form-check-input&quot; type=&quot;checkbox&quot; id=&quot;gr-answer-two&quot; checked&gt;
+      &lt;span class=&quot;gr-answer-toggle-text&quot;&gt;&lt;span&gt;Two angles for answers&lt;/span&gt;&lt;small class=&quot;gr-answer-toggle-note&quot;&gt;Question always shows two&lt;/small&gt;&lt;/span&gt;
+    &lt;/label&gt;
     &lt;button type=&quot;button&quot; class=&quot;btn&quot; id=&quot;gr-new&quot;&gt;New set&lt;/button&gt;
   &lt;/div&gt;
 
@@ -1078,7 +1088,7 @@ html&gt;body{padding:0}&lt;/style&gt;
   &lt;script&gt;
   (()=&gt;{
     const root=document.getElementById(&#x27;generative-rotation-test&#x27;);
-    const levelEl=root.querySelector(&#x27;#gr-level&#x27;), newEl=root.querySelector(&#x27;#gr-new&#x27;), nextEl=root.querySelector(&#x27;#gr-next&#x27;);
+    const levelEl=root.querySelector(&#x27;#gr-level&#x27;), answerTwoEl=root.querySelector(&#x27;#gr-answer-two&#x27;), newEl=root.querySelector(&#x27;#gr-new&#x27;), nextEl=root.querySelector(&#x27;#gr-next&#x27;);
     const questionEl=root.querySelector(&#x27;#gr-question&#x27;), metaEl=root.querySelector(&#x27;#gr-meta&#x27;), referenceEl=root.querySelector(&#x27;#gr-reference&#x27;);
     const optionsEl=root.querySelector(&#x27;#gr-options&#x27;), feedbackEl=root.querySelector(&#x27;#gr-feedback&#x27;);
     const countEl=root.querySelector(&#x27;#gr-count&#x27;), scoreEl=root.querySelector(&#x27;#gr-score&#x27;);
@@ -1239,8 +1249,14 @@ html&gt;body{padding:0}&lt;/style&gt;
       return `&lt;span class=&quot;gr-view-pair&quot;&gt;${solidSvg(points,matrix,`${label}, angle 1`)}${solidSvg(points,mul(SECOND_VIEW,matrix),`${label}, angle 2`)}&lt;/span&gt;`;
     }
 
-    let state={index:0,score:0,streak:0,answered:false,complete:false,correctIndex:0};
+    let state={index:0,score:0,streak:0,answered:false,complete:false,correctIndex:0}, currentCubeCount=0;
     const level=()=&gt;Number(levelEl.value), cubeCount=()=&gt;({1:6,2:8,3:10})[level()];
+
+    function syncAnswerAngles(){
+      const two=answerTwoEl.checked;
+      root.classList.toggle(&#x27;gr-one-answer-angle&#x27;,!two);
+      if(!state.complete&amp;&amp;currentCubeCount)metaEl.textContent=`Question: 2 angles · Answers: ${two?&#x27;2 angles&#x27;:&#x27;1 angle&#x27;} · new ${currentCubeCount}-cube solid · pitch + yaw + roll`;
+    }
 
     function setStatus(){
       countEl.textContent=`${Math.min(state.index+1,10)} / 10`;scoreEl.textContent=`Score ${state.score}`;
@@ -1249,13 +1265,13 @@ html&gt;body{padding:0}&lt;/style&gt;
 
     function buildQuestion(){
       state.answered=false; nextEl.hidden=true; feedbackEl.textContent=&#x27;&#x27;;feedbackEl.className=&#x27;gr-feedback&#x27;;optionsEl.innerHTML=&#x27;&#x27;;
-      const n=cubeCount(), base=generateSolid(n), forbidden=new Set([canonical(base)]), decoys=[];
+      const n=cubeCount(), base=generateSolid(n), forbidden=new Set([canonical(base)]), decoys=[]; currentCubeCount=n;
       while(decoys.length&lt;3){const d=alterSolid(base,forbidden);if(d)decoys.push(d);else{forbidden.clear();forbidden.add(canonical(base));}}
       const [refOrientation,matchOrientation]=orientationPair(base,level());
       referenceEl.innerHTML=`&lt;div class=&quot;gr-reference-stack&quot;&gt;&lt;div class=&quot;gr-angle-labels text-small&quot;&gt;&lt;span&gt;Angle 1&lt;/span&gt;&lt;span&gt;Angle 2&lt;/span&gt;&lt;/div&gt;${dualSolid(base,refOrientation,&#x27;Reference solid&#x27;)}&lt;/div&gt;`;
       const options=shuffle([{points:base,correct:true,matrix:matchOrientation},...decoys.map(points=&gt;({points,correct:false,matrix:readableOrientation(points,level())}))]);
       state.correctIndex=options.findIndex(o=&gt;o.correct);
-      metaEl.textContent=`Two synchronized views · new ${n}-cube solid · pitch + yaw + roll`;
+      syncAnswerAngles();
       options.forEach((o,i)=&gt;{
         const b=document.createElement(&#x27;button&#x27;);b.type=&#x27;button&#x27;;b.className=&#x27;btn viz-tile&#x27;;b.setAttribute(&#x27;aria-label&#x27;,`Option ${letters[i]}`);
         b.innerHTML=`&lt;span class=&quot;gr-option-inner&quot;&gt;&lt;span class=&quot;gr-letter&quot;&gt;${letters[i]}&lt;/span&gt;${dualSolid(o.points,o.matrix,`Option ${letters[i]}`)}&lt;/span&gt;`;
@@ -1279,7 +1295,7 @@ html&gt;body{padding:0}&lt;/style&gt;
     }
     function reset(){state={index:0,score:0,streak:0,answered:false,complete:false,correctIndex:0};questionEl.textContent=&#x27;Which option is the same solid, only rotated?&#x27;;buildQuestion();}
     nextEl.addEventListener(&#x27;click&#x27;,()=&gt;{if(state.complete)reset();else if(state.index&gt;=9){state.complete=true;finish();}else{state.index++;buildQuestion();}});
-    newEl.addEventListener(&#x27;click&#x27;,reset);levelEl.addEventListener(&#x27;change&#x27;,reset);reset();
+    newEl.addEventListener(&#x27;click&#x27;,reset);levelEl.addEventListener(&#x27;change&#x27;,reset);answerTwoEl.addEventListener(&#x27;change&#x27;,syncAnswerAngles);reset();
   })();
   &lt;/script&gt;
 &lt;/div&gt;
