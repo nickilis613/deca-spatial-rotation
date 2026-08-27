@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="referrer" content="no-referrer">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' blob: data: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://esm.sh https://fonts.bunny.net https://fonts.googleapis.com https://fonts.gstatic.com https://unpkg.com; style-src 'unsafe-inline' blob: data: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://esm.sh https://fonts.bunny.net https://fonts.googleapis.com https://fonts.gstatic.com https://unpkg.com; img-src blob: data: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://esm.sh https://fonts.bunny.net https://fonts.googleapis.com https://fonts.gstatic.com https://unpkg.com; font-src blob: data: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://esm.sh https://fonts.bunny.net https://fonts.googleapis.com https://fonts.gstatic.com https://unpkg.com; media-src blob: data: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://esm.sh https://fonts.bunny.net https://fonts.googleapis.com https://fonts.gstatic.com https://unpkg.com; worker-src blob:; connect-src blob: data:; frame-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
-<title>Mental Rotation Gym</title>
+<title>Deca Spatial Training</title>
 <style>:root{color-scheme:light dark;background:light-dark(rgb(255 255 255), rgb(24 24 24))}html,body{margin:0}body{box-sizing:border-box;padding:1rem;background:inherit}iframe{display:block;width:100%;height:calc(100vh - 2rem);margin:0 auto;border:0}</style>
 </head>
 <body>
@@ -16,7 +16,7 @@
 &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot;&gt;
 &lt;meta name=&quot;referrer&quot; content=&quot;no-referrer&quot;&gt;
 &lt;meta http-equiv=&quot;Content-Security-Policy&quot; content=&quot;default-src &#x27;none&#x27;; script-src &#x27;unsafe-inline&#x27; &#x27;unsafe-eval&#x27; &#x27;wasm-unsafe-eval&#x27; blob: data: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://esm.sh https://fonts.bunny.net https://fonts.googleapis.com https://fonts.gstatic.com https://unpkg.com; style-src &#x27;unsafe-inline&#x27; blob: data: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://esm.sh https://fonts.bunny.net https://fonts.googleapis.com https://fonts.gstatic.com https://unpkg.com; img-src blob: data: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://esm.sh https://fonts.bunny.net https://fonts.googleapis.com https://fonts.gstatic.com https://unpkg.com; font-src blob: data: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://esm.sh https://fonts.bunny.net https://fonts.googleapis.com https://fonts.gstatic.com https://unpkg.com; media-src blob: data: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://esm.sh https://fonts.bunny.net https://fonts.googleapis.com https://fonts.gstatic.com https://unpkg.com; worker-src blob:; connect-src blob: data:; frame-src &#x27;none&#x27;; object-src &#x27;none&#x27;; base-uri &#x27;none&#x27;; form-action &#x27;none&#x27;&quot;&gt;
-&lt;title&gt;Mental Rotation Gym&lt;/title&gt;
+&lt;title&gt;Deca Spatial Training&lt;/title&gt;
 &lt;style&gt;:root {
   color-scheme: light dark;
   background-color: var(
@@ -908,6 +908,96 @@ html&gt;body{padding:0}&lt;/style&gt;
 &lt;div id=&quot;generative-rotation-test&quot;&gt;
   &lt;style&gt;
     #generative-rotation-test { color:var(--foreground); }
+    #generative-rotation-test .gr-brand {
+      position:relative;
+      isolation:isolate;
+      display:flex;
+      min-height:150px;
+      align-items:center;
+      justify-content:center;
+      margin-bottom:18px;
+      overflow:hidden;
+      border:1px solid #281107;
+      border-radius:22px;
+      background:
+        radial-gradient(ellipse at 50% 112%, rgba(255,80,0,.28) 0, rgba(255,80,0,.08) 35%, transparent 68%),
+        linear-gradient(180deg,#050505 0%,#090401 100%);
+      box-shadow:inset 0 -25px 55px rgba(255,70,0,.07),0 16px 44px rgba(0,0,0,.3);
+    }
+    #generative-rotation-test .gr-brand::before {
+      content:&quot;&quot;;
+      position:absolute;
+      z-index:-1;
+      inset:auto 8% -74px;
+      height:120px;
+      border-radius:50%;
+      background:#ff3c00;
+      filter:blur(42px);
+      opacity:.32;
+      animation:gr-fire-glow 2.8s ease-in-out infinite alternate;
+    }
+    #generative-rotation-test .gr-brand-title {
+      position:relative;
+      margin:0;
+      padding:20px 18px 28px;
+      color:#ffb000;
+      background:linear-gradient(180deg,#fff8c7 2%,#ffd04a 30%,#ff761b 61%,#d71900 83%,#5a0800 100%);
+      -webkit-background-clip:text;
+      background-clip:text;
+      -webkit-text-fill-color:transparent;
+      font-family:Impact,Haettenschweiler,&quot;Arial Narrow Bold&quot;,sans-serif;
+      font-size:clamp(2.45rem,8vw,6rem);
+      font-weight:900;
+      letter-spacing:.055em;
+      line-height:.88;
+      text-align:center;
+      text-transform:uppercase;
+      filter:drop-shadow(0 2px 0 #4c0800) drop-shadow(0 5px 8px rgba(255,54,0,.58));
+    }
+    #generative-rotation-test .gr-brand-title::after {
+      content:&quot;&quot;;
+      position:absolute;
+      right:8%;
+      bottom:15px;
+      left:8%;
+      z-index:-1;
+      height:24px;
+      border-radius:50%;
+      background:#ff3300;
+      filter:blur(18px);
+      opacity:.45;
+      animation:gr-title-flicker 1.9s ease-in-out infinite alternate;
+    }
+    #generative-rotation-test .gr-embers {
+      position:absolute;
+      inset:0;
+      overflow:hidden;
+      pointer-events:none;
+    }
+    #generative-rotation-test .gr-embers span {
+      position:absolute;
+      bottom:-8px;
+      width:4px;
+      height:4px;
+      border-radius:50%;
+      background:#ffd36a;
+      box-shadow:0 0 7px 2px #ff4b00;
+      opacity:0;
+      animation:gr-ember 3.8s linear infinite;
+    }
+    #generative-rotation-test .gr-embers span:nth-child(1){left:11%;animation-delay:-.6s}
+    #generative-rotation-test .gr-embers span:nth-child(2){left:27%;animation-delay:-2.4s;animation-duration:4.6s}
+    #generative-rotation-test .gr-embers span:nth-child(3){left:49%;animation-delay:-1.5s;animation-duration:3.3s}
+    #generative-rotation-test .gr-embers span:nth-child(4){left:68%;animation-delay:-3.1s;animation-duration:4.2s}
+    #generative-rotation-test .gr-embers span:nth-child(5){left:87%;animation-delay:-.2s;animation-duration:3.6s}
+    @keyframes gr-fire-glow { to { opacity:.5; transform:scaleX(1.08) translateY(-5px); } }
+    @keyframes gr-title-flicker { 0%,28%{opacity:.34} 39%{opacity:.55} 43%{opacity:.38} 100%{opacity:.5} }
+    @keyframes gr-ember {
+      0%{opacity:0;transform:translate3d(0,0,0) scale(.6)}
+      12%{opacity:.9}
+      70%{opacity:.45}
+      100%{opacity:0;transform:translate3d(18px,-145px,0) scale(1.25)}
+    }
     #generative-rotation-test .gr-head { display:flex; align-items:end; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:14px; }
     #generative-rotation-test .gr-title { margin:0; }
     #generative-rotation-test .gr-controls { margin-bottom:14px; }
@@ -938,6 +1028,8 @@ html&gt;body{padding:0}&lt;/style&gt;
     #generative-rotation-test .gr-actions { display:flex; justify-content:center; }
     #generative-rotation-test #gr-next[hidden] { display:none; }
     @media (max-width:560px) {
+      #generative-rotation-test .gr-brand { min-height:118px; border-radius:16px; }
+      #generative-rotation-test .gr-brand-title { padding-inline:10px; letter-spacing:.035em; }
       #generative-rotation-test .gr-status { grid-template-columns:1fr auto; }
       #generative-rotation-test .gr-status .progress { grid-column:1/-1; grid-row:2; }
       #generative-rotation-test .gr-stage { min-height:760px; }
@@ -946,6 +1038,11 @@ html&gt;body{padding:0}&lt;/style&gt;
       #generative-rotation-test .gr-options .gr-solid { max-width:145px; }
     }
   &lt;/style&gt;
+
+  &lt;header class=&quot;gr-brand&quot; aria-label=&quot;Deca Spatial Training&quot;&gt;
+    &lt;h1 class=&quot;gr-brand-title&quot;&gt;DECA SPATIAL TRAINING&lt;/h1&gt;
+    &lt;span class=&quot;gr-embers&quot; aria-hidden=&quot;true&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;/span&gt;
+  &lt;/header&gt;
 
   &lt;div class=&quot;gr-head&quot;&gt;
     &lt;h2 class=&quot;gr-title&quot;&gt;Generative 3D Rotation Test&lt;/h2&gt;
