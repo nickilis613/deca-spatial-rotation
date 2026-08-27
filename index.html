@@ -912,21 +912,24 @@ html&gt;body{padding:0}&lt;/style&gt;
     #generative-rotation-test .gr-title { margin:0; }
     #generative-rotation-test .gr-controls { margin-bottom:14px; }
     #generative-rotation-test .gr-status { display:grid; grid-template-columns:1fr auto auto; align-items:center; gap:12px; margin-bottom:14px; }
-    #generative-rotation-test .gr-stage { min-height:520px; display:flex; flex-direction:column; justify-content:center; gap:12px; }
+    #generative-rotation-test .gr-stage { min-height:520px; display:flex; flex-direction:column; justify-content:center; gap:12px; background:#050505; color:#f4f4f4; border-color:#252525; box-shadow:0 18px 48px rgba(0,0,0,.28); }
     #generative-rotation-test .gr-prompt { text-align:center; font-weight:500; }
-    #generative-rotation-test .gr-meta { text-align:center; color:var(--muted-foreground); }
+    #generative-rotation-test .gr-meta { text-align:center; color:#a8a8a8; }
     #generative-rotation-test .gr-reference { display:flex; justify-content:center; }
     #generative-rotation-test .gr-reference .gr-solid { max-width:300px; }
     #generative-rotation-test .gr-options { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px; }
+    #generative-rotation-test .gr-options button { background:#0b0b0b; color:#f4f4f4; border-color:#303030; box-shadow:inset 0 1px 0 rgba(255,255,255,.04); }
+    #generative-rotation-test .gr-options button:hover:not(:disabled) { background:#121212; border-color:#555; }
+    #generative-rotation-test .gr-options button[aria-pressed=&quot;true&quot;] { border-color:#f2f2f2; box-shadow:0 0 0 2px rgba(255,255,255,.18); }
     #generative-rotation-test .gr-option-inner { display:flex; flex-direction:column; align-items:center; width:100%; }
     #generative-rotation-test .gr-letter { align-self:flex-start; font-weight:500; }
-    #generative-rotation-test .gr-solid { display:block; width:100%; max-width:220px; height:auto; aspect-ratio:13/11; }
-    #generative-rotation-test .gr-face-bright { fill:color-mix(in srgb,var(--viz-series-1) 16%,var(--card)); stroke:color-mix(in srgb,var(--foreground) 78%,var(--border)); stroke-width:1.7; stroke-linejoin:round; }
-    #generative-rotation-test .gr-face-mid { fill:color-mix(in srgb,var(--viz-series-1) 55%,var(--card)); stroke:color-mix(in srgb,var(--foreground) 78%,var(--border)); stroke-width:1.7; stroke-linejoin:round; }
-    #generative-rotation-test .gr-face-dark { fill:color-mix(in srgb,var(--viz-series-1) 88%,var(--card)); stroke:color-mix(in srgb,var(--foreground) 78%,var(--border)); stroke-width:1.7; stroke-linejoin:round; }
+    #generative-rotation-test .gr-solid { display:block; width:100%; max-width:220px; height:auto; aspect-ratio:13/11; filter:drop-shadow(0 12px 9px rgba(0,0,0,.72)); }
+    #generative-rotation-test .gr-face-bright,
+    #generative-rotation-test .gr-face-mid,
+    #generative-rotation-test .gr-face-dark { stroke:#202020; stroke-width:1.45; stroke-linejoin:round; vector-effect:non-scaling-stroke; }
     #generative-rotation-test .gr-feedback { min-height:24px; text-align:center; font-weight:500; }
-    #generative-rotation-test .gr-feedback.good { color:var(--green); }
-    #generative-rotation-test .gr-feedback.bad { color:var(--red); }
+    #generative-rotation-test .gr-feedback.good { color:#b7ddb9; }
+    #generative-rotation-test .gr-feedback.bad { color:#ef9a9a; }
     #generative-rotation-test .gr-actions { display:flex; justify-content:center; }
     #generative-rotation-test #gr-next[hidden] { display:none; }
     @media (max-width:560px) {
@@ -1094,8 +1097,9 @@ html&gt;body{padding:0}&lt;/style&gt;
       {n:[0,0,-1],v:[[-1,-1,-1],[-1,1,-1],[1,1,-1],[1,-1,-1]]}
     ];
 
+    let svgSequence=0;
     function solidSvg(points,matrix,label){
-      const center=[0,1,2].map(i=&gt;points.reduce((s,p)=&gt;s+p[i],0)/points.length), half=.43;
+      const center=[0,1,2].map(i=&gt;points.reduce((s,p)=&gt;s+p[i],0)/points.length), half=.47;
       const faces=[];
       points.forEach(p=&gt;{
         const c=p.map((v,i)=&gt;v-center[i]);
@@ -1114,8 +1118,15 @@ html&gt;body{padding:0}&lt;/style&gt;
       const minY=Math.min(...all.map(p=&gt;p[1])),maxY=Math.max(...all.map(p=&gt;p[1]));
       const scale=Math.min(42,220/Math.max(.1,maxX-minX),180/Math.max(.1,maxY-minY));
       const dx=130-(minX+maxX)*scale/2,dy=110-(minY+maxY)*scale/2;
-      const polygons=projected.map(f=&gt;`&lt;polygon class=&quot;${f.cls}&quot; points=&quot;${f.pts.map(p=&gt;`${p[0]*scale+dx},${p[1]*scale+dy}`).join(&#x27; &#x27;)}&quot;&gt;&lt;/polygon&gt;`).join(&#x27;&#x27;);
-      return `&lt;svg class=&quot;gr-solid&quot; viewBox=&quot;0 0 260 220&quot; role=&quot;img&quot; aria-label=&quot;${label}&quot;&gt;&lt;title&gt;${label}&lt;/title&gt;${polygons}&lt;/svg&gt;`;
+      const uid=`gr-shade-${++svgSequence}`;
+      const shade=f=&gt;f.cls===&#x27;gr-face-bright&#x27;?&#x27;bright&#x27;:f.cls===&#x27;gr-face-mid&#x27;?&#x27;mid&#x27;:&#x27;dark&#x27;;
+      const polygons=projected.map(f=&gt;`&lt;polygon class=&quot;${f.cls}&quot; fill=&quot;url(#${uid}-${shade(f)})&quot; points=&quot;${f.pts.map(p=&gt;`${p[0]*scale+dx},${p[1]*scale+dy}`).join(&#x27; &#x27;)}&quot;&gt;&lt;/polygon&gt;`).join(&#x27;&#x27;);
+      const gradients=`&lt;defs&gt;
+        &lt;linearGradient id=&quot;${uid}-bright&quot; x1=&quot;0&quot; y1=&quot;0&quot; x2=&quot;1&quot; y2=&quot;1&quot;&gt;&lt;stop offset=&quot;0&quot; stop-color=&quot;#fafafa&quot;&gt;&lt;/stop&gt;&lt;stop offset=&quot;.52&quot; stop-color=&quot;#dedede&quot;&gt;&lt;/stop&gt;&lt;stop offset=&quot;1&quot; stop-color=&quot;#a9a9a9&quot;&gt;&lt;/stop&gt;&lt;/linearGradient&gt;
+        &lt;linearGradient id=&quot;${uid}-mid&quot; x1=&quot;0&quot; y1=&quot;0&quot; x2=&quot;1&quot; y2=&quot;1&quot;&gt;&lt;stop offset=&quot;0&quot; stop-color=&quot;#d2d2d2&quot;&gt;&lt;/stop&gt;&lt;stop offset=&quot;.55&quot; stop-color=&quot;#a1a1a1&quot;&gt;&lt;/stop&gt;&lt;stop offset=&quot;1&quot; stop-color=&quot;#696969&quot;&gt;&lt;/stop&gt;&lt;/linearGradient&gt;
+        &lt;linearGradient id=&quot;${uid}-dark&quot; x1=&quot;0&quot; y1=&quot;0&quot; x2=&quot;1&quot; y2=&quot;1&quot;&gt;&lt;stop offset=&quot;0&quot; stop-color=&quot;#9b9b9b&quot;&gt;&lt;/stop&gt;&lt;stop offset=&quot;.58&quot; stop-color=&quot;#686868&quot;&gt;&lt;/stop&gt;&lt;stop offset=&quot;1&quot; stop-color=&quot;#353535&quot;&gt;&lt;/stop&gt;&lt;/linearGradient&gt;
+      &lt;/defs&gt;`;
+      return `&lt;svg class=&quot;gr-solid&quot; viewBox=&quot;0 0 260 220&quot; role=&quot;img&quot; aria-label=&quot;${label}&quot; shape-rendering=&quot;geometricPrecision&quot;&gt;&lt;title&gt;${label}&lt;/title&gt;${gradients}${polygons}&lt;/svg&gt;`;
     }
 
     let state={index:0,score:0,streak:0,answered:false,complete:false,correctIndex:0};
