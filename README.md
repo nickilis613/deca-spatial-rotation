@@ -1,33 +1,33 @@
-# DECA Training Tool
+# Deca Spatial Rotation — Three.js edition
 
-An interactive, generative mental-rotation trainer inspired by classic 3D spatial-reasoning tests.
+A ground-up JavaScript rewrite of [nickilis613/deca-spatial-rotation](https://github.com/nickilis613/deca-spatial-rotation), using Three.js for true 3D rendering.
 
-## Current capabilities
+## What changed
 
-- Generates a new connected 3D cube structure for every question.
-- Produces one matching rotation and three structurally altered distractors.
-- Uses compound pitch, yaw, and roll rotations rather than a single-axis turn.
-- Offers 6-, 8-, and 10-cube difficulty levels.
-- Includes ten-question sessions, scoring, and immediate feedback.
-- Works on desktop and mobile screens.
+- True orthographic 3D rendering with beveled cube geometry, studio lighting, and soft contact shadows.
+- A deterministic bank of 96 puzzles: 32 each at 6, 8, and 10 cubes.
+- Four answer options per puzzle with exactly one rotation-equivalent match.
+- Proper-rotation canonicalization across all 24 orientations of a cube; reflections are not treated as rotations.
+- Automated validation for connectivity, cube counts, unique option structures, and single-answer correctness.
+- Ten-question sessions, scoring, streaks, keyboard controls, and responsive layouts.
 
-## Visual direction
+## Run
 
-The next renderer iteration should use a true 3D scene with:
+ES modules must be served over HTTP. From this folder, run:
 
-- beveled cube geometry;
-- orthographic perspective;
-- soft studio lighting and contact shadows;
-- clear depth separation without misleading overlaps;
-- deterministic generation for reproducible questions;
-- accessible keyboard and touch controls.
+```sh
+npm start
+```
 
-## Run locally
+Then open `http://localhost:4173`.
 
-Open `index.html` in a modern browser.
+## Validate the puzzle bank
 
-## Reference
+No package installation is required for the data tests:
 
-The exercise format is modeled after Professor LaMarr's [Mental Rotation Test](https://www.youtube.com/watch?v=VlBRj7qwGGk): one reference solid and four answer choices.
+```sh
+npm test
+```
 
+Three.js 0.180.0 is pinned through the import map in `index.html`.
 
