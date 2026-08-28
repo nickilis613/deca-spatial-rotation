@@ -5,7 +5,7 @@ A ground-up JavaScript rewrite of [nickilis613/deca-spatial-rotation](https://gi
 ## What changed
 
 - True orthographic 3D rendering with beveled cube geometry and shadow-free studio lighting for visual clarity.
-- A 6–100 block slider with a bounded, deterministic 24-puzzle pool generated lazily for every selected size.
+- A 6–1,000 block slider with puzzles generated lazily for the selected size.
 - Four answer options per puzzle with exactly one rotation-equivalent match.
 - Proper-rotation canonicalization across all 24 orientations of a cube; reflections are not treated as rotations.
 - Automated validation for connectivity, cube counts, unique option structures, and single-answer correctness.
@@ -21,14 +21,6 @@ npm start
 ```
 
 Then open `http://localhost:4173`.
-
-## Validate the puzzle bank
-
-No package installation is required for the data tests:
-
-```sh
-npm test
-```
 
 Three.js 0.180.0 is pinned through the import map in `index.html`.
 

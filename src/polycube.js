@@ -139,16 +139,20 @@ function generateSolid(count, rng) {
     const occupied = new Set(["0,0,0"]);
     let current = points[0];
     while (points.length < count) {
-      const anchor = rng() < 0.7 ? current : choose(points, rng);
-      const candidates = shuffled(DIRECTIONS, rng)
-        .map((direction) => add(anchor, direction))
-        .filter((candidate) => !occupied.has(pointKey(candidate)))
-        .filter((candidate) => degree(candidate, occupied) <= 2)
-        .filter(() => degree(anchor, occupied) < 4);
-      if (!candidates.length) break;
-      current = choose(candidates, rng);
-      points.push(current);
-      occupied.add(pointKey(current));
+      let added = null;
+      for (let anchorAttempt = 0; anchorAttempt < 180 && !added; anchorAttempt += 1) {
+        const anchor = anchorAttempt === 0 && rng() < 0.7 ? current : choose(points, rng);
+        if (degree(anchor, occupied) >= 4) continue;
+        const candidates = shuffled(DIRECTIONS, rng)
+          .map((direction) => add(anchor, direction))
+          .filter((candidate) => !occupied.has(pointKey(candidate)))
+          .filter((candidate) => degree(candidate, occupied) <= 2);
+        if (candidates.length) added = choose(candidates, rng);
+      }
+      if (!added) break;
+      current = added;
+      points.push(added);
+      occupied.add(pointKey(added));
     }
     if (points.length !== count || !spansThreeAxes(points)) continue;
     const orbitSize = new Set(PROPER_ROTATIONS.map((rotation) => (

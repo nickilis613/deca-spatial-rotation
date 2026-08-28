@@ -86,7 +86,9 @@ class PolycubeView {
     this.group = new THREE.Group();
     const center = points.reduce((sum, point) => sum.map((value, axis) => value + point[axis]), [0, 0, 0])
       .map((value) => value / points.length);
-    this.geometry = new RoundedBoxGeometry(0.92, 0.92, 0.92, 4, 0.075);
+    this.geometry = points.length > 1000
+      ? new THREE.BoxGeometry(0.92, 0.92, 0.92)
+      : new RoundedBoxGeometry(0.92, 0.92, 0.92, 4, 0.075);
     this.material = new THREE.MeshStandardMaterial({ color: 0xd8e3f2, roughness: 0.4, metalness: 0.05 });
     const cubes = new THREE.InstancedMesh(this.geometry, this.material, points.length);
     const transform = new THREE.Matrix4();
