@@ -1,10 +1,12 @@
 import * as THREE from "three";
 import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
-import { PUZZLE_BANK, validatePuzzle } from "./polycube.js";
+import { canonicalKey, createPuzzle, hashString, validatePuzzle } from "./polycube.js";
 
 const SESSION_LENGTH = 10;
+const PUZZLES_PER_BLOCK_COUNT = 24;
 const root = document.querySelector("#app");
-const difficulty = document.querySelector("#difficulty");
+const cubeCountInput = document.querySelector("#cube-count");
+const cubeCountValue = document.querySelector("#cube-count-value");
 const newSessionButton = document.querySelector("#new-session");
 const nextButton = document.querySelector("#next-question");
 const progressLabel = document.querySelector("#progress-label");
@@ -17,7 +19,7 @@ const feedback = document.querySelector("#feedback");
 const questionHeading = document.querySelector("#question-heading");
 
 const renderers = [];
-const queues = new Map();
+const puzzlePools = new Map();
 let state = { question: 0, score: 0, streak: 0, answered: false, current: null };
 
 function randomShuffle(items) {
@@ -32,10 +34,25 @@ function randomShuffle(items) {
 }
 
 function nextPuzzle(cubeCount) {
-  if (!queues.has(cubeCount) || queues.get(cubeCount).length === 0) {
-    queues.set(cubeCount, randomShuffle(PUZZLE_BANK.filter((puzzle) => puzzle.cubeCount === cubeCount)));
+  if (!puzzlePools.has(cubeCount)) {
+    puzzlePools.set(cubeCount, { puzzles: [], available: [], signatures: new Set(), seedIndex: 0 });
   }
-  return queues.get(cubeCount).pop();
+  const pool = puzzlePools.get(cubeCount);
+  if (pool.puzzles.length < PUZZLES_PER_BLOCK_COUNT) {
+    for (let attempt = 0; attempt < 200; attempt += 1) {
+      const seed = hashString(`deca-slider-${cubeCount}-${pool.seedIndex}`);
+      pool.seedIndex += 1;
+      const puzzle = createPuzzle(seed, cubeCount);
+      const signature = canonicalKey(puzzle.reference.points);
+      if (pool.signatures.has(signature)) continue;
+      pool.signatures.add(signature);
+      pool.puzzles.push(puzzle);
+      return puzzle;
+    }
+    throw new Error(`Could not create a distinct ${cubeCount}-block puzzle`);
+  }
+  if (pool.available.length === 0) pool.available = randomShuffle(pool.puzzles);
+  return pool.available.pop();
 }
 
 class PolycubeView {
@@ -71,11 +88,16 @@ class PolycubeView {
       .map((value) => value / points.length);
     this.geometry = new RoundedBoxGeometry(0.92, 0.92, 0.92, 4, 0.075);
     this.material = new THREE.MeshStandardMaterial({ color: 0xd8e3f2, roughness: 0.4, metalness: 0.05 });
-    points.forEach((point) => {
-      const cube = new THREE.Mesh(this.geometry, this.material);
-      cube.position.set(point[0] - center[0], point[1] - center[1], point[2] - center[2]);
-      this.group.add(cube);
+    const cubes = new THREE.InstancedMesh(this.geometry, this.material, points.length);
+    const transform = new THREE.Matrix4();
+    points.forEach((point, index) => {
+      transform.makeTranslation(point[0] - center[0], point[1] - center[1], point[2] - center[2]);
+      cubes.setMatrixAt(index, transform);
     });
+    cubes.instanceMatrix.needsUpdate = true;
+    cubes.computeBoundingBox();
+    cubes.computeBoundingSphere();
+    this.group.add(cubes);
     this.group.rotation.set(orientation.x, orientation.y, orientation.z, "XYZ");
     this.scene.add(this.group);
 
@@ -128,7 +150,7 @@ function updateStatus() {
 function renderQuestion() {
   clearViews();
   state.answered = false;
-  state.current = nextPuzzle(Number(difficulty.value));
+  state.current = nextPuzzle(Number(cubeCountInput.value));
   const validation = validatePuzzle(state.current);
   if (!validation.valid) throw new Error(`Invalid puzzle ${state.current.id}: ${validation.errors.join(", ")}`);
 
@@ -218,7 +240,8 @@ function resetSession() {
 }
 
 newSessionButton.addEventListener("click", resetSession);
-difficulty.addEventListener("change", resetSession);
+cubeCountInput.addEventListener("input", () => { cubeCountValue.value = cubeCountInput.value; });
+cubeCountInput.addEventListener("change", resetSession);
 nextButton.addEventListener("click", () => root.dataset.state === "complete" ? resetSession() : advance());
 document.addEventListener("keydown", (event) => {
   if (state.answered || event.altKey || event.ctrlKey || event.metaKey) return;

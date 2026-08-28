@@ -25,10 +25,10 @@ body {
     var(--bg);
 }
 
-button, select { font: inherit; }
-button, select, a { -webkit-tap-highlight-color: transparent; }
+button, input { font: inherit; }
+button, input, a { -webkit-tap-highlight-color: transparent; }
 
-button, select {
+button {
   min-height: 42px;
   color: var(--text);
   border: 1px solid var(--line);
@@ -38,7 +38,7 @@ button, select {
 
 button { padding: 0 16px; cursor: pointer; }
 button:hover:not(:disabled) { border-color: #526580; background: #1b2637; }
-button:focus-visible, select:focus-visible { outline: 3px solid rgba(127, 169, 255, 0.55); outline-offset: 2px; }
+button:focus-visible, input:focus-visible { outline: 3px solid rgba(127, 169, 255, 0.55); outline-offset: 2px; }
 button:disabled { cursor: default; }
 
 #app { width: min(1480px, 100%); margin: 0 auto; padding: 20px clamp(14px, 3vw, 44px) 24px; }
@@ -56,8 +56,9 @@ button:disabled { cursor: default; }
 .brand-mark i:nth-child(3) { left: 17px; top: 20px; background: #dbe7f8; }
 
 .controls { display: flex; align-items: center; gap: 10px; }
-.controls label { color: var(--muted); font-size: 13px; }
-select { padding: 0 34px 0 12px; }
+.slider-label { display: flex; align-items: baseline; gap: 7px; color: var(--muted); font-size: 13px; white-space: nowrap; }
+.slider-label output { min-width: 3ch; color: var(--text); font-weight: 700; text-align: right; }
+#cube-count { width: clamp(150px, 24vw, 320px); min-width: 70px; accent-color: var(--accent); cursor: pointer; }
 
 .status {
   margin: 14px 0 18px;
@@ -123,8 +124,7 @@ footer { padding: 18px 4px 0; color: var(--muted); font-size: 12px; }
   #app { padding-top: 12px; }
   .topbar { align-items: stretch; flex-direction: column; gap: 12px; }
   .controls { width: 100%; flex-wrap: nowrap; justify-content: stretch; }
-  .controls select { min-width: 0; flex: 1; }
-  .controls label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  #cube-count { width: auto; flex: 1; }
   .status { gap: 10px; font-size: 12px; }
   .status #streak { display: none; }
   .exercise { padding: 16px 12px; border-radius: 14px; }
@@ -139,7 +139,6 @@ footer { padding: 18px 4px 0; color: var(--muted); font-size: 12px; }
   .brand small { display: none; }
   .brand strong { font-size: 16px; }
   .controls { gap: 6px; }
-  .controls select { max-width: none; }
   .controls button { padding-inline: 10px; }
   .option { height: 168px; }
   .reference-view { height: 230px; }

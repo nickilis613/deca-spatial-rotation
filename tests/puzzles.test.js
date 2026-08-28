@@ -6,6 +6,8 @@ import {
   applyGridRotation,
   areRotationEquivalent,
   canonicalKey,
+  createPuzzle,
+  hashString,
   validatePuzzle,
 } from "../src/polycube.js";
 
@@ -39,6 +41,15 @@ test("canonical matching recognizes every proper rotation of every reference", (
       const rotated = puzzle.reference.points.map((point) => applyGridRotation(rotation, point));
       assert.equal(areRotationEquivalent(puzzle.reference.points, rotated), true, puzzle.id);
     }
+  }
+});
+
+test("every selectable block count from 6 through 100 produces one uniquely solvable puzzle", () => {
+  for (let cubeCount = 6; cubeCount <= 100; cubeCount += 1) {
+    const puzzle = createPuzzle(hashString(`slider-validation-${cubeCount}`), cubeCount);
+    const validation = validatePuzzle(puzzle);
+    assert.equal(validation.valid, true, `${cubeCount} blocks: ${validation.errors.join(", ")}`);
+    assert.equal(validation.matchCount, 1, `${cubeCount} blocks`);
   }
 });
 

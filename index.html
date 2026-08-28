@@ -24,12 +24,8 @@
         <span><strong>DECA</strong><small>Spatial Rotation</small></span>
       </a>
       <div class="controls">
-        <label for="difficulty">Solid size</label>
-        <select id="difficulty">
-          <option value="6">Starter · 6 cubes</option>
-          <option value="8" selected>Skilled · 8 cubes</option>
-          <option value="10">Expert · 10 cubes</option>
-        </select>
+        <label class="slider-label" for="cube-count"><span>Blocks</span><output id="cube-count-value" for="cube-count">8</output></label>
+        <input id="cube-count" type="range" min="6" max="100" step="1" value="8">
         <button id="new-session" type="button">New session</button>
       </div>
     </header>
@@ -66,10 +62,10 @@
 
     <footer>
       <span>Choose with A–D or 1–4</span>
-      <span>96 validated puzzles · proper rotations only</span>
+      <span>6–100 blocks · every puzzle validated · proper rotations only</span>
     </footer>
   </main>
-  <script type="module" src="./src/main.js?v=shadow-free-1"></script>
+  <script type="module" src="./src/main.js?v=block-slider-1"></script>
 </body>
 </html>
 
