@@ -54,8 +54,6 @@ class PolycubeView {
 
     this.renderer = new THREE.WebGLRenderer({ canvas: this.canvas, antialias: true, powerPreference: "high-performance" });
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-    this.renderer.shadowMap.enabled = true;
-    this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
     this.renderer.toneMappingExposure = 1.15;
@@ -63,10 +61,6 @@ class PolycubeView {
     this.scene.add(new THREE.HemisphereLight(0xdce8ff, 0x273043, 2.1));
     const keyLight = new THREE.DirectionalLight(0xffffff, 3.4);
     keyLight.position.set(-5, 8, 7);
-    keyLight.castShadow = true;
-    keyLight.shadow.mapSize.set(512, 512);
-    keyLight.shadow.camera.near = 0.1;
-    keyLight.shadow.camera.far = 30;
     this.scene.add(keyLight);
     const rimLight = new THREE.DirectionalLight(0x7aa7ff, 1.4);
     rimLight.position.set(6, 1, -5);
@@ -80,8 +74,6 @@ class PolycubeView {
     points.forEach((point) => {
       const cube = new THREE.Mesh(this.geometry, this.material);
       cube.position.set(point[0] - center[0], point[1] - center[1], point[2] - center[2]);
-      cube.castShadow = true;
-      cube.receiveShadow = true;
       this.group.add(cube);
     });
     this.group.rotation.set(orientation.x, orientation.y, orientation.z, "XYZ");
@@ -90,15 +82,6 @@ class PolycubeView {
     const bounds = new THREE.Box3().setFromObject(this.group);
     const sphere = bounds.getBoundingSphere(new THREE.Sphere());
     this.radius = Math.max(sphere.radius, 1.8);
-    const floor = new THREE.Mesh(
-      new THREE.PlaneGeometry(this.radius * 5, this.radius * 5),
-      new THREE.ShadowMaterial({ color: 0x000000, opacity: 0.34 }),
-    );
-    floor.rotation.x = -Math.PI / 2;
-    floor.position.y = bounds.min.y - 0.24;
-    floor.receiveShadow = true;
-    this.scene.add(floor);
-    this.floor = floor;
 
     this.resizeObserver = new ResizeObserver(() => this.render());
     this.resizeObserver.observe(host);
@@ -123,8 +106,6 @@ class PolycubeView {
     this.resizeObserver.disconnect();
     this.geometry.dispose();
     this.material.dispose();
-    this.floor.geometry.dispose();
-    this.floor.material.dispose();
     this.renderer.dispose();
   }
 }

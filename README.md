@@ -4,7 +4,7 @@ A ground-up JavaScript rewrite of [nickilis613/deca-spatial-rotation](https://gi
 
 ## What changed
 
-- True orthographic 3D rendering with beveled cube geometry, studio lighting, and soft contact shadows.
+- True orthographic 3D rendering with beveled cube geometry and shadow-free studio lighting for visual clarity.
 - A deterministic bank of 96 puzzles: 32 each at 6, 8, and 10 cubes.
 - Four answer options per puzzle with exactly one rotation-equivalent match.
 - Proper-rotation canonicalization across all 24 orientations of a cube; reflections are not treated as rotations.
